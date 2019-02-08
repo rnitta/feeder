@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:feeder/utils/padding.dart';
+import 'package:feeder/utils/palette.dart';
+import 'package:feeder/scenes/signin/webview.dart';
 
 class Signin extends StatefulWidget {
   @override
@@ -30,6 +32,7 @@ class _SigninState extends State<Signin> {
                 ),
                 PaddingText('サインインしてください', 0.0, 40.0, 0.0, 40.0),
                 RaisedButton(
+                    color: Palette.primal,
                     onPressed: () => _showModal(context),
                     child: const Text('サインイン'))
               ],
@@ -45,7 +48,7 @@ class _SigninState extends State<Signin> {
           settings: const RouteSettings(name: '/signin/webview'),
           builder: (BuildContext context) => Scaffold(
                 body: Center(
-                  child: Text('aaaaaaaa'),
+                  child: SigninWebview(context),
                 ),
               ),
           fullscreenDialog: true, // ダイアログで表示するかどうか

@@ -23,6 +23,7 @@ class _SplashState extends State<Splash> {
 
   // ネットワークチェックもしたい
   void pushFirstScene() {
-    Navigator.of(context).pushReplacementNamed('/require_auth');
+    // 戻れなくなるから普通のpushでいいかも
+    Navigator.of(context).pushReplacementNamed('/signin');
   }
 }

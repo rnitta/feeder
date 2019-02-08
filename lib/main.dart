@@ -14,7 +14,8 @@ class AppRoot extends StatelessWidget {
       showPerformanceOverlay: false,
       routes: <String, WidgetBuilder>{
         '/': (_) => Splash(),
-        '/require_auth': (_) => Signin(),
+        '/signin': (_) => Signin(),
+        '/signed_home': (_) => Scaffold(),
       },
     );
   }

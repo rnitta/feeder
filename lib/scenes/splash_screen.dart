@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:feeder/utils/constants.dart';
 
 class Splash extends StatefulWidget {
   @override
@@ -22,8 +24,14 @@ class _SplashState extends State<Splash> {
   }
 
   // ネットワークチェックもしたい
-  void pushFirstScene() {
-    // 戻れなくなるから普通のpushでいいかも
-    Navigator.of(context).pushReplacementNamed('/signin');
+  void pushFirstScene() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString(Constants.aceessTokenPrefName);
+    //FIXME: pushreplaces以外なければまとめる
+    if (accessToken == null) {
+      Navigator.of(context).pushReplacementNamed('/signin');
+    } else {
+      Navigator.of(context).pushReplacementNamed('/signed/team_ramify');
+    }
   }
 }

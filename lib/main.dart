@@ -15,7 +15,7 @@ class AppRoot extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/': (_) => Splash(),
         '/signin': (_) => Signin(),
-        '/signed_home': (_) => Scaffold(),
+        '/signed/team_ramify': (_) => Scaffold(),
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:feeder/utils/constants.dart';
 
 class SigninWebview extends WebviewScaffold {
   static const queries = {
@@ -31,13 +32,14 @@ class SigninWebview extends WebviewScaffold {
       if (token != null) {
         // null安全他にいい方法がありそう
         saveTokenToKVS(token);
-        Navigator.popUntil(context, ModalRoute.withName('/signin'));
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/', ModalRoute.withName('/'));
       }
     });
   }
 
   void saveTokenToKVS(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('esa_access_token', token);
+    await prefs.setString(Constants.aceess_token_pref_name, token);
   }
 }

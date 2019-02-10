@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:feeder/scenes/signin.dart';
 import 'package:feeder/scenes/splash_screen.dart';
+import 'package:feeder/scenes/signed/ramify_route.dart';
 
 void main() => runApp(AppRoot());
 
@@ -15,7 +16,7 @@ class AppRoot extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/': (_) => Splash(),
         '/signin': (_) => Signin(),
-        '/signed/team_ramify': (_) => Scaffold(),
+        '/signed/team_ramify': (_) => SignedRamifyTeamScene(),
       },
     );
   }

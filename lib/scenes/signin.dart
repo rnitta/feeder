@@ -3,6 +3,7 @@ import 'package:feeder/utils/padding.dart';
 import 'package:feeder/utils/palette.dart';
 import 'package:feeder/scenes/signin/webview.dart';
 
+//FIXME: statelessにしよう
 class Signin extends StatefulWidget {
   @override
   _SigninState createState() => _SigninState();

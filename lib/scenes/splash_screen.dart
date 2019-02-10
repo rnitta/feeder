@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feeder/utils/constants.dart';
+import 'dart:async';
 
 class Splash extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () => pushFirstScene());
+    Future.delayed(const Duration(milliseconds: 500), () => pushFirstScene());
   }
 
   @override
@@ -27,11 +28,12 @@ class _SplashState extends State<Splash> {
   void pushFirstScene() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString(Constants.aceessTokenPrefName);
+    print(accessToken);
     //FIXME: pushreplaces以外なければまとめる
     if (accessToken == null) {
-      Navigator.of(context).pushReplacementNamed('/signin');
+      Navigator.pushReplacementNamed(context, '/signin');
     } else {
-      Navigator.of(context).pushReplacementNamed('/signed/team_ramify');
+      Navigator.pushReplacementNamed(context, '/signed/team_ramify');
     }
   }
 }

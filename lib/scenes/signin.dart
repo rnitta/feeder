@@ -45,7 +45,7 @@ class _SigninState extends State<Signin> {
   void _showModal(BuildContext context) {
     Navigator.push(
         context,
-        new MaterialPageRoute<Null>(
+        MaterialPageRoute<Null>(
           settings: const RouteSettings(name: '/signin/webview'),
           builder: (BuildContext context) => Scaffold(
                 body: Center(

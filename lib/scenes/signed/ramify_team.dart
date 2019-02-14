@@ -1,24 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:feeder/utils/constants.dart';
-import 'package:http/http.dart' as http;
-import 'package:scoped_model/scoped_model.dart';
 import 'dart:async';
 import 'dart:convert';
-
-//FIXME: modelsあたりに分離
-class EsaTeam {
-  final String url;
-  final String name;
-  final String iconUrl;
-  final String description;
-
-  EsaTeam.fromJson(Map<String, dynamic> json)
-      : url = json['url'],
-        name = json['name'],
-        iconUrl = json['icon'],
-        description = json['description'];
-}
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:feeder/models/esa_team.dart';
+import 'package:feeder/utils/constants.dart';
+import 'package:feeder/utils/palette.dart';
 
 class TeamsModel extends Model {
   List<EsaTeam> teamList = [];
@@ -26,10 +14,16 @@ class TeamsModel extends Model {
   bool isError = false;
 
   void fetchTeams() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var accessToken = prefs.getString(Constants.aceessTokenPrefName);
-    final response = await http.get(
-        'https://api.esa.io/v1/teams?access_token=${accessToken}&per_page=100');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String accessToken = prefs.getString(Constants.aceessTokenPrefName);
+    final queries = <String, String>{
+      'access_token': accessToken,
+      'per_page': '100'
+    };
+    final String apiUrl =
+        Uri.https('api.esa.io', 'v1/teams', queries).toString();
+    final response = await http.get(apiUrl);
+
     if (response.statusCode == 200) {
       List<EsaTeam> list = [];
       Map<String, dynamic> decoded = json.decode(response.body);
@@ -54,10 +48,23 @@ class SignedRamifyTeamScene extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('チーム選択')),
-        body: ScopedModelDescendant<TeamsModel>(
-            builder: (context, child, model) =>
-                Center(child: _conditionalBuilder(model))));
+      appBar: AppBar(title: const Text('チーム選択')),
+      body: ScopedModelDescendant<TeamsModel>(
+          builder: (context, child, model) =>
+              Center(child: _conditionalBuilder(model))),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Palette.defaultButtonBack,
+        foregroundColor: Palette.defaultFont,
+        tooltip: 'サインアウトしてアカウントを切り替える',
+        icon: const Icon(Icons.keyboard_backspace),
+        label: const Text('サインアウト'),
+        onPressed: () async {
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.remove(Constants.aceessTokenPrefName);
+          Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+        },
+      ),
+    );
   }
 
   Widget _conditionalBuilder(TeamsModel model) {

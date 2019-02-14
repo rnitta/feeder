@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:feeder/scenes/signed/ramify_team.dart';
+import 'package:feeder/models/esa_team.dart';
 
 class SignedRoot extends Scaffold {
   EsaTeam team;

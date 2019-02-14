@@ -23,8 +23,8 @@ class SigninWebview extends WebviewScaffold {
           userAgent: userAgentStr,
           hidden: false,
           resizeToAvoidBottomPadding: false,
-          // clearCache: true,
-          // clearCookies: true,
+          clearCache: true,
+          clearCookies: true,
         ) {
     print(authURL);
     addSigninCompleteWatcher(context);

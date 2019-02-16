@@ -1,3 +1,4 @@
+// entities等にうつしても良いかも
 class EsaTeam {
   final String url;
   final String name;

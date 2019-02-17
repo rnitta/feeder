@@ -1,24 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:feeder/models/esa_team.dart';
 import 'package:feeder/models/signed_root_selected_tab.dart';
+import 'package:feeder/scenes/signed/newest_articles.dart';
 
 class SignedRoot extends StatelessWidget {
-  final SignedRootSeletedTabModel selectedTabModel;
-  SignedRoot(this.selectedTabModel) : super();
+  final selectedTabModel = SignedRootSeletedTabModel();
 
   @override
   Widget build(BuildContext context) {
-    print('build');
     return ScopedModel<SignedRootSeletedTabModel>(
-        model: SignedRootSeletedTabModel(), child: this._scaffold());
+        model: selectedTabModel, child: this._scaffold());
   }
-
-  final _tabs = <Widget>[
-    Text('Index 0: Home'),
-    Text('Index 1: Business'),
-    Text('Index 2: School'),
-  ];
 
   Scaffold _scaffold() {
     return Scaffold(
@@ -32,24 +24,39 @@ class SignedRoot extends StatelessWidget {
   Widget _body() {
     return ScopedModelDescendant<SignedRootSeletedTabModel>(
         builder: (context, child, model) {
-      print('a');
-      return Center(child: _tabs.elementAt(selectedTabModel.selectedIndex));
+      return Center(child: _content());
     });
   }
 
-  BottomNavigationBar _bnb() {
-    return BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-            icon: const Icon(Icons.home), title: const Text('Home')),
-        BottomNavigationBarItem(
-            icon: const Icon(Icons.business), title: const Text('Business')),
-        BottomNavigationBarItem(
-            icon: const Icon(Icons.school), title: const Text('School')),
-      ],
-      currentIndex: 1,
-      fixedColor: Colors.deepPurple,
-      onTap: selectedTabModel.changeIndex,
-    );
+  Widget _content() {
+    switch (selectedTabModel.selectedIndex) {
+      case 0:
+        return Text('0');
+      case 1:
+        return NewestArticlesListView();
+      case 2:
+        return Text('2');
+      default:
+        return null;
+    }
+  }
+
+  Widget _bnb() {
+    return ScopedModelDescendant<SignedRootSeletedTabModel>(
+        builder: (context, child, model) {
+      return BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.category), title: const Text('カテゴリ')),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.list), title: const Text('新着')),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.settings), title: const Text('設定')),
+        ],
+        currentIndex: selectedTabModel.selectedIndex,
+        fixedColor: Colors.teal[700],
+        onTap: selectedTabModel.changeIndex,
+      );
+    });
   }
 }

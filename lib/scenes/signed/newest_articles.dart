@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math'; // ランダムテスト用
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,11 +21,25 @@ class ArticleItemEntity {
   }
 }
 
+// トップレベルに置かなければならない
+int parseNextPage(String responseBody) {
+  return json.decode(responseBody)['next_page'];
+}
+
+// トップレベルに置かなければならない
+List<ArticleItemEntity> deserialize(String responseBody) {
+  return (json.decode(responseBody)['posts'] as List<dynamic>)
+      .map<ArticleItemEntity>((object) =>
+          ArticleItemEntity.deserialize(object as Map<String, dynamic>))
+      .toList();
+}
+
 class NewestArticlesState extends Model {
   List<ArticleItemEntity> articles = [];
   int page;
   int nextPage = 1;
   bool isFetchable = true;
+  bool refreshing = false;
 
   Future<void> fetchArticles() async {
     page = nextPage;
@@ -45,12 +60,21 @@ class NewestArticlesState extends Model {
         Uri.https('api.esa.io', '/v1/teams/$teamName/posts', queries)
             .toString();
     final response = await http.get(apiUrl);
-    Map<String, dynamic> decoded = json.decode(response.body);
-    nextPage = decoded['next_page'];
-    final posts = decoded['posts'] as List<dynamic>;
-    articles.addAll(posts.map((object) =>
-        ArticleItemEntity.deserialize(object as Map<String, dynamic>)));
+    nextPage = await compute(parseNextPage, response.body);
+    final posts =
+        await compute(deserialize, response.body); // 2回デコード走ることになるのであとで考え直す
+    articles.addAll(posts);
+    refreshing = false;
     notifyListeners();
+  }
+
+  Future<void> refresh() async {
+    page = null;
+    nextPage = 1;
+    articles = [];
+    refreshing = true;
+    notifyListeners();
+    await fetchArticles();
   }
 }
 
@@ -64,7 +88,12 @@ class NewestArticlesListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ScopedModel<NewestArticlesState>(
-      model: this.newestArticlesState, child: _listView());
+      model: this.newestArticlesState, child: _refreshable());
+
+  Widget _refreshable() => RefreshIndicator(
+        child: _listView(),
+        onRefresh: newestArticlesState.refresh,
+      );
 
   Widget _listView() {
     return ScopedModelDescendant<NewestArticlesState>(
@@ -72,6 +101,9 @@ class NewestArticlesListView extends StatelessWidget {
       final itemCount = this.newestArticlesState.articles.length;
       return ListView.builder(
         itemBuilder: (BuildContext context, int index) {
+          if (newestArticlesState.refreshing) {
+            return null;
+          }
           //あとでもうちょっと先読みするようにする
           if (index == itemCount) {
             newestArticlesState.fetchArticles();

@@ -103,7 +103,10 @@ class EsaTeamButton extends FlatButton {
               title: Text(team.name),
               subtitle: Text(team.url),
             )),
-            onPressed: () {
+            onPressed: () async {
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              prefs.setString(Constants.selectedTeamPrefName, team.name);
               Navigator.pushReplacementNamed(context, '/signed/root');
             });
 }

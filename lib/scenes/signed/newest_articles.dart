@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math'; // ランダムテスト用
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:feeder/utils/constants.dart';
 
 class ArticleItemEntity {
   String name;
@@ -11,30 +13,50 @@ class ArticleItemEntity {
   String category;
 
   // null気をつける
-  ArticleItemEntity.deserialize() {
-    name = '';
+  ArticleItemEntity.deserialize(Map<String, dynamic> item) {
+    name = item['name'];
+    wip = item['wip'];
+    category = item['category'];
   }
 }
 
 class NewestArticlesState extends Model {
   List<ArticleItemEntity> articles = [];
+  int page;
+  int nextPage = 1;
   bool isFetchable = true;
 
   Future<void> fetchArticles() async {
-    if (isFetchable) {
-      Future.delayed(const Duration(seconds: 1), () {
-        articles.addAll([null, null, null]);
-        if (Random.secure().nextBool()) {
-          isFetchable = false;
-        }
-        notifyListeners();
-      });
+    page = nextPage;
+    if (page == null) {
+      isFetchable = false;
+      notifyListeners();
+      return;
     }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String teamName = prefs.getString(Constants.selectedTeamPrefName);
+    final String accessToken = prefs.getString(Constants.aceessTokenPrefName);
+    final queries = <String, String>{
+      'access_token': accessToken,
+      'page': page.toString(),
+      'per_page': '30' //適切な数に
+    };
+    final String apiUrl =
+        Uri.https('api.esa.io', '/v1/teams/$teamName/posts', queries)
+            .toString();
+    final response = await http.get(apiUrl);
+    Map<String, dynamic> decoded = json.decode(response.body);
+    nextPage = decoded['next_page'];
+    final posts = decoded['posts'] as List<dynamic>;
+    articles.addAll(posts.map((object) =>
+        ArticleItemEntity.deserialize(object as Map<String, dynamic>)));
+    notifyListeners();
   }
 }
 
 class ArticleItemComponent extends Container {
-  ArticleItemComponent() : super(child: Text('hoge'));
+  ArticleItemComponent(ArticleItemEntity articleEntity)
+      : super(child: Text('${articleEntity.category} ${articleEntity.name}'));
 }
 
 class NewestArticlesListView extends StatelessWidget {
@@ -67,7 +89,7 @@ class NewestArticlesListView extends StatelessWidget {
           } else if (index > itemCount) {
             return null;
           }
-          return ArticleItemComponent();
+          return ArticleItemComponent(newestArticlesState.articles[index]);
         },
       );
     });

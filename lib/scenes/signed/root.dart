@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:feeder/models/signed_root_selected_tab.dart';
+import 'package:feeder/models/signed_root_title.dart';
 import 'package:feeder/scenes/signed/newest_articles.dart';
 
 class SignedRoot extends StatelessWidget {
   final selectedTabModel = SignedRootSeletedTabModel();
+  final signedRootTitleModel = SignedRootTitleModel('新着一覧');
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<SignedRootSeletedTabModel>(
-        model: selectedTabModel, child: this._scaffold());
+    return ScopedModel<SignedRootTitleModel>(
+        model: signedRootTitleModel,
+        child: ScopedModel<SignedRootSeletedTabModel>(
+            model: selectedTabModel, child: this._scaffold()));
   }
 
   Scaffold _scaffold() {
     return Scaffold(
         appBar: AppBar(
-          title: Text('title'),
+          title: ScopedModelDescendant<SignedRootTitleModel>(
+              builder: (context, child, model) => Text(model.name)),
         ),
         body: _body(),
         bottomNavigationBar: _bnb());

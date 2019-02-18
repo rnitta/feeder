@@ -7,6 +7,7 @@ import 'package:feeder/scenes/signed/newest_articles.dart';
 class SignedRoot extends StatelessWidget {
   final selectedTabModel = SignedRootSeletedTabModel();
   final signedRootTitleModel = SignedRootTitleModel('新着一覧');
+  NewestArticlesListView cachedNewestArticlesView;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,10 @@ class SignedRoot extends StatelessWidget {
       case 0:
         return Text('0');
       case 1:
-        return NewestArticlesListView();
+        if (cachedNewestArticlesView == null) {
+          cachedNewestArticlesView = NewestArticlesListView();
+        }
+        return cachedNewestArticlesView;
       case 2:
         return Text('2');
       default:

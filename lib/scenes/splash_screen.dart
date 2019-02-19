@@ -29,7 +29,6 @@ class _SplashState extends State<Splash> {
   void pushFirstScene() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString(Constants.aceessTokenPrefName);
-    print(accessToken);
     //FIXME: pushreplaces以外なければまとめる
     if (accessToken == null) {
       Navigator.pushReplacementNamed(context, '/signin');

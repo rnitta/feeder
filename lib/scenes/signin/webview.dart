@@ -26,7 +26,6 @@ class SigninWebview extends WebviewScaffold {
           clearCache: true,
           clearCookies: true,
         ) {
-    print(authURL);
     addSigninCompleteWatcher(context);
   }
 

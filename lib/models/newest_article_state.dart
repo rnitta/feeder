@@ -7,18 +7,24 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:feeder/utils/constants.dart';
 
 class ArticleItemEntity {
+  int number;
   String name;
   bool wip;
   String category;
   String createdByIcon;
+  String updatedByIcon;
+  DateTime updatedAt;
+  List<String> tags;
 
-  // null気をつける
   ArticleItemEntity.deserialize(Map<String, dynamic> item) {
+    number = item['nunmber'];
     name = item['name'];
     wip = item['wip'];
     category = item['category'];
-    createdByIcon =
-        ((item['created_by'] ?? {}) as Map<String, dynamic>)['icon'];
+    createdByIcon = ((item['created_by'] ?? {}) as Map<String, dynamic>)['icon'];
+    updatedByIcon = ((item['updated_by'] ?? {}) as Map<String, dynamic>)['icon'];
+    updatedAt = DateTime.parse(item['updated_at']);
+    tags = item['tags'].cast<String>();
   }
 }
 
@@ -30,8 +36,7 @@ int parseNextPage(String responseBody) {
 // トップレベルに置かなければならない
 List<ArticleItemEntity> deserialize(String responseBody) {
   return (json.decode(responseBody)['posts'] as List<dynamic>)
-      .map<ArticleItemEntity>((object) =>
-          ArticleItemEntity.deserialize(object as Map<String, dynamic>))
+      .map<ArticleItemEntity>((object) => ArticleItemEntity.deserialize(object as Map<String, dynamic>))
       .toList();
 }
 
@@ -62,12 +67,9 @@ class NewestArticlesState extends Model {
       'page': page.toString(),
       'per_page': '30' //適切な数に
     };
-    final String apiUrl =
-        Uri.https('api.esa.io', '/v1/teams/$teamName/posts', queries)
-            .toString();
+    final String apiUrl = Uri.https('api.esa.io', '/v1/teams/$teamName/posts', queries).toString();
     final response = await http.get(apiUrl);
-    final posts =
-        await compute(deserialize, response.body); // 2回デコード走ることになるのであとで考え直す
+    final posts = await compute(deserialize, response.body); // 2回デコード走ることになるのであとで考え直す
     articles.addAll(posts);
     nextPage = await compute(parseNextPage, response.body);
     refreshing = false;

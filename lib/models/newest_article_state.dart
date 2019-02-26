@@ -17,7 +17,7 @@ class ArticleItemEntity {
   List<String> tags;
 
   ArticleItemEntity.deserialize(Map<String, dynamic> item) {
-    number = item['nunmber'];
+    number = item['number'];
     name = item['name'];
     wip = item['wip'];
     category = item['category'];

@@ -45,20 +45,24 @@ class NewestArticlesListView extends StatelessWidget {
           }
           return GestureDetector(
               onTap: () {
-                _navigateToArticleShowSnece(context, index);
+                _navigateToArticleShowSnece(context, newestArticlesState.articles[index]);
               },
-              child: ArticleItemComponent(newestArticlesState.articles[index]));
+              child: Hero(
+                // Hero毎コンポーネントにいれたほうがいいかも
+                tag: 'articlec${newestArticlesState.articles[index].number}',
+                child: ArticleItemComponent(newestArticlesState.articles[index]),
+              ));
         },
       );
     });
   }
 
-  void _navigateToArticleShowSnece(BuildContext context, int index) {
+  void _navigateToArticleShowSnece(BuildContext context, ArticleItemEntity entity) {
     Navigator.push(
       context,
-      new MaterialPageRoute<Null>(
+      MaterialPageRoute<Null>(
         settings: const RouteSettings(name: "/signed/article_short"),
-        builder: (BuildContext context) => ArticleShortView(/* 必要なパラメータがあればここで渡す */),
+        builder: (BuildContext context) => ArticleShortView(entity),
       ),
     );
   }
